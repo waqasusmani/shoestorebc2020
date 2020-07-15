@@ -1,38 +1,50 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, Outlet } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link, Outlet, useParams } from 'react-router-dom'
 import './App.css';
 
 function App() {
   return (
-    <Router>
-      <nav>
-        <Link to='/'>Home </Link> {' '}
-        <Link to='launch'>Launch</Link>
-      </nav>
-
-      <Routes>
-        <Route path='/' element={<Home />}></Route>
-        <Route path='launch' element={<Launch />}>
-          <Route path='/' element={<LaunchIndex />}></Route>
-        </Route>
-      </Routes>
-    </Router>
-  );
-}
-
-function Launch() {
-  return (
     <div>
-      This is Launch
-      <Outlet />
+      <Router>
+        <div className="nav-bar">
+          <Link to='/' className="home">Home </Link> {' '}
+          <Link to='product' className="launch">Products</Link>
+        </div>
+        <Routes>
+          <Route path='/' element={<Home />}></Route>
+          <Route path='product' element={<Launch />}>
+            <Route path='/' element={<LaunchIndex />}></Route>
+            <Route path=":slug" element={<LaunchShoe />}></Route>
+          </Route>
+          <Route path='*' element={<NotFound />}></Route>
+        </Routes>
+      </Router>
     </div>
-  )
+  );
 }
 
 function Home() {
   return (
+    <div className = 'home-heading'>
+      <h2>Welcome to Shoe Store</h2>
+      <div className='home-page'>
+        <img src="https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/89120cc5-0213-4c35-8224-d60469ce348f/air-max-270-react-se-shoe-9PzxFV.jpg" alt="pic"></img>
+      </div>
+    </div>
+  )
+}
+
+function NotFound() {
+  return (
     <div>
-      Welcome to Home Page
+      <h1> Page Not Found</h1>
+    </div>
+  )
+}
+function Launch() {
+  return (
+    <div>
+      <Outlet />
     </div>
   )
 }
@@ -43,19 +55,44 @@ function LaunchIndex() {
       <ul >
         {Object.entries(shoes).map(([slug, { name, img }]) => (
           <li className="list" key={slug}>
-            <h4 className="name">{name}</h4>
-            <img className='img' src={img} alt={name} />
+            <Link to={`/product/${slug}`}>
+              <h4 className="name">{name}</h4>
+              <img className='img' src={img} alt={name} />
+            </Link>
           </li>
+
         ))}
       </ul>
-    </div>
+    </div >
   )
 }
 
+function LaunchShoe() {
+  const { slug } = useParams();
+  const shoe = shoes[slug];
+
+  if (!shoe) {
+    return (
+      <h2>
+        Not Found
+      </h2>
+    )
+  }
+
+  const { name, img } = shoe;
+  return (
+    <div className="product-detail">
+      <h2>{name}</h2>
+      <div className="product-details">
+        <img src={img} alt={name} />
+      </div>
+    </div>
+  )
+}
 const shoes = {
   "air-max-alpha-trainer-gym": {
     name: "Air Max Alpha 2",
-    img: "https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/dkcd56uzxvqg4sank4gf/air-max-alpha-trainer-2-training-shoe-PRDr42.jpg"
+    img: "https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/dkcd56uzxvqg4sank4gf/air-max-alpha-trainer-2-training-shoe-PRDr42.jpg",
   },
 
   "air-zoom": {
